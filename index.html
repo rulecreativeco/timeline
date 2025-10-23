@@ -1,275 +1,87 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Wedding Timeline Generator – Rule Creative Co.</title>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    :root{
-      --bg:#ffffff; --fg:#1b1b1b; --muted:#6b7280; --brand:#9a633e; --card:#ffffff; --line:#e5e7eb;
-      --radius:18px; --pad:16px; --font-body:'Montserrat', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      --font-accent:'Morally Serif', Georgia, serif; --shadow:0 10px 18px rgba(2,12,27,.04), 0 2px 6px rgba(2,12,27,.06);
-      --badge-bg:#f7efe9; --badge-fg:#5b3a25;
-    }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:var(--font-body);background:#fff;color:var(--fg);} 
-    .wrap{max-width:920px;margin:28px auto;padding:0 18px 64px}
-    header.hero{text-align:center;padding:28px 18px;border-radius:28px}
-    h1{font-family:var(--font-accent);font-weight:600;font-size:clamp(1.6rem, 3vw, 2.4rem);margin:0}
-    .sub{color:var(--muted);margin:8px auto;font-size:1rem;max-width:820px}
-
-    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:var(--pad);box-shadow:var(--shadow);margin-top:16px}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-    label{display:block;font-size:.9rem;margin:8px 0 6px;color:#111827;font-weight:700}
-    input, select{width:100%;padding:12px;border:1px solid var(--line);border-radius:12px;background:#fff}
-    .controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;justify-content:center}
-    button{border:1px solid var(--brand);background:var(--brand);color:#fff;border-radius:999px;padding:12px 18px;font-weight:800;cursor:pointer}
-    button.alt{background:#fff;color:var(--brand)}
-
-    .timeline{border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:var(--shadow)}
-    .tl-item{display:grid;grid-template-columns:140px 1fr;gap:16px;padding:16px 18px;border-top:1px dashed var(--line);background:#fff}
-    .tl-item:nth-child(even){background:#fffaf7}
-    .tl-section{background:#fbf7f4;border-top:1px solid #f0e6df;font-weight:800;font-family:var(--font-accent)}
-    .badge{display:inline-block;padding:3px 10px;border-radius:999px;background:var(--badge-bg);color:var(--badge-fg);font-size:.75rem;margin-left:8px}
-  </style>
-</head>
-<body>
-<div class="wrap">
-  <header class="hero">
-    <h1>Wedding Timeline Generator</h1>
-    <p class="sub"><strong>Use this as a general outline and my go-to suggestions.</strong> Every wedding day is different, so we’ll tweak and customize your final timeline together. Timings are approximate and depend on your coverage preferences.</p>
-  </header>
-
-  <div class="card" id="form">
-    <div class="row">
-      <div>
-        <label>Wedding date</label>
-        <input type="date" id="wDate" />
-      </div>
-      <div>
-        <label>Coverage hours</label>
-        <select id="coverage">
-          <option value="8">8 hours</option>
-          <option value="10">10 hours</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="row">
-      <div>
-        <label>First look before the ceremony?</label>
-        <select id="firstLook">
-          <option value="yes">Yes</option>
-          <option value="no">No, we’ll see each other at the ceremony</option>
-        </select>
-      </div>
-      <div>
-        <label>Private vows during first look?</label>
-        <select id="privateVows">
-          <option value="no">No</option>
-          <option value="yes">Yes</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="row">
-      <div>
-        <label>Add first look with dad / family?</label>
-        <select id="dadFirstLook">
-          <option value="no">No</option>
-          <option value="yes">Yes</option>
-        </select>
-      </div>
-      <div>
-        <label>Ceremony start time</label>
-        <input type="time" id="ceremonyTime" />
-      </div>
-    </div>
-
-    <div class="row">
-      <div>
-        <label>Ceremony length</label>
-        <select id="ceremonyLen">
-          <option value="20">20 minutes</option>
-          <option value="30">30 minutes (standard)</option>
-          <option value="45">45 minutes</option>
-          <option value="60">60 minutes</option>
-          <option value="75">75 minutes</option>
-          <option value="90">90 minutes</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="controls">
-      <button id="gen" type="button">Generate Timeline</button>
-      <button class="alt" id="pdf" type="button">Download PDF</button>
-    </div>
-  </div>
-
-  <div class="timeline" id="timeline" hidden>
-    <ul class="tl-list" id="tlList"></ul>
-  </div>
-</div>
-
 <script>
 (function(){
-  // ---------- helpers ----------
   const el = id => document.getElementById(id);
   const addMinutes = (base,m) => new Date(base.getTime()+m*60000);
-  const parseTimeOnDate = (dateStr,hhmm)=>{ if(!dateStr||!hhmm) return null; const [h,m]=hhmm.split(':').map(Number); const d=new Date(`${dateStr}T00:00:00`); d.setHours(h,m,0,0); return d; };
   const fmt12 = d => { let h=d.getHours(), m=d.getMinutes(); const ampm=h>=12?'PM':'AM'; h=h%12; if(h===0)h=12; return `${h}:${String(m).padStart(2,'0')} ${ampm}`; };
 
-  // NOAA-style sunset calc for Central Minnesota (lat 45.56, lon -94.16), returns local time minus 30 min
-  const computeSunsetMinus30 = (dateStr) => {
-    // Sunset for Central Minnesota (lat 45.56, lon -94.16) in LOCAL time, rounded to nearest 15 min, then minus 30 min.
-    const deg2rad = d => d*Math.PI/180, rad2deg = r => r*180/Math.PI;
-    const roundToQuarter = (dt) => {
-      const d = new Date(dt);
-      d.setSeconds(0,0);
-      let mins = d.getMinutes();
-      let rounded = Math.round(mins/15)*15;
-      if(rounded === 60){ d.setHours(d.getHours()+1); rounded = 0; }
-      d.setMinutes(rounded);
-      return d;
-    };
-    try{
-      const selectedLocal = new Date(`${dateStr}T00:00:00`);
-      const start = new Date(selectedLocal.getFullYear(),0,0);
-      const N = Math.floor((selectedLocal - start)/86400000);
-      const lat = 45.56, lon = -94.16;
-      const lngHour = lon/15;
-      const t = N + ((18 - lngHour) / 24);
-      const M = (0.9856 * t) - 3.289;
-      let L = M + (1.916*Math.sin(deg2rad(M))) + (0.020*Math.sin(deg2rad(2*M))) + 282.634; L = (L + 360) % 360;
-      let RA = rad2deg(Math.atan(0.91764 * Math.tan(deg2rad(L)))); RA = (RA + 360) % 360;
-      const Lq  = Math.floor(L/90) * 90; const RAq = Math.floor(RA/90) * 90; RA = (RA + (Lq - RAq)) / 15;
-      const sinDec = 0.39782 * Math.sin(deg2rad(L)); const cosDec = Math.cos(Math.asin(sinDec));
-      const zenith = 90.833;
-      const cosH = (Math.cos(deg2rad(zenith)) - (sinDec * Math.sin(deg2rad(lat)))) / (cosDec * Math.cos(deg2rad(lat)));
-      if(cosH < -1 || cosH > 1) return null;
-      const H = Math.acos(cosH) * 180/Math.PI / 15;
-      const T = H + RA - (0.06571 * t) - 6.622;
-      const UT = ((T - lngHour) % 24 + 24) % 24;
-      // Build a date in LOCAL time on the selected day using the UT hours converted via timezone
-      const baseUTCms = Date.UTC(selectedLocal.getFullYear(), selectedLocal.getMonth(), selectedLocal.getDate());
-      let sunsetLocal = new Date(baseUTCms + UT*3600000);
-      // If this landed before the selected local midnight (e.g., 02:00 UTC -> previous local date), bump a day
-      if (sunsetLocal < selectedLocal) sunsetLocal = new Date(sunsetLocal.getTime() + 24*3600000);
-      const minus30 = new Date(sunsetLocal.getTime() - 30*60000);
-      return roundToQuarter(minus30);
-    }catch(e){ return null; }
-  };
+  // Use jsPDF to generate a styled PDF
+  async function downloadTimelinePDF(){
+    const { jsPDF } = window.jspdf || await import('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
 
-  function render(events){
-    events.sort((a,b)=>a.start-b.start);
-    const list = el('tlList'); list.innerHTML='';
+    const tlList = document.querySelectorAll('#tlList .tl-item');
+    if(!tlList.length){ alert('Please generate a timeline first.'); return; }
+
+    const pdf = new jsPDF({orientation:'portrait', unit:'pt', format:'letter'});
+    const brandColor = '#9a633e';
+
+    // Title
+    pdf.setFont('helvetica','bold');
+    pdf.setFontSize(18);
+    pdf.setTextColor(brandColor);
+    pdf.text('Rule Creative Co. – Wedding Timeline', 40, 60);
+
+    // Body
+    pdf.setFontSize(12);
+    pdf.setTextColor('#000');
+    let y = 90;
+
     let currentSection = '';
-    for(const ev of events){
-      if(ev.section !== currentSection){
-        const sec = document.createElement('li');
-        sec.className = 'tl-item tl-section';
-        sec.innerHTML = `<div class="time">—</div><div>${ev.section}</div>`;
-        list.appendChild(sec);
-        currentSection = ev.section;
+    tlList.forEach(item => {
+      if(item.classList.contains('tl-section')){
+        currentSection = item.textContent.trim();
+        pdf.setFont('times','bold');
+        pdf.setFontSize(14);
+        pdf.setTextColor(brandColor);
+        y += 25;
+        pdf.text(currentSection, 40, y);
+        y += 10;
+        pdf.setDrawColor(brandColor);
+        pdf.line(40, y, 550, y);
+        y += 20;
+      } else {
+        const time = item.querySelector('.time')?.textContent.trim() || '';
+        const desc = item.querySelector('strong')?.textContent.trim() || '';
+        pdf.setFont('helvetica','normal');
+        pdf.setFontSize(11);
+        pdf.setTextColor('#000');
+        pdf.text(`${time}   ${desc}`, 50, y);
+        y += 18;
+        if(y > 740){ pdf.addPage(); y = 60; }
       }
-      const li = document.createElement('li');
-      li.className = 'tl-item';
-      const end = ev.dur ? addMinutes(ev.start, ev.dur) : ev.start;
-      li.innerHTML = `<div class="time">${fmt12(ev.start)}${ev.noEnd?'':`–${fmt12(end)}`}</div><div><strong>${ev.label}</strong>${ev.note?` <span class='badge'>${ev.note}</span>`:''}</div>`;
-      list.appendChild(li);
-    }
-  }
+    });
 
-  function buildTimeline(){
-    const date = el('wDate').value;
-    const fl = el('firstLook').value==='yes';
-    const vows = el('privateVows').value==='yes';
-    const dadFL = el('dadFirstLook').value==='yes';
-    const flLen = vows?60:45;
-    const cerTime = el('ceremonyTime').value;
-    const cerLen = parseInt(el('ceremonyLen').value,10) || 30;
-    const coverage = parseInt(el('coverage').value,10) || 8;
-
-    if(!date || !cerTime){ alert('Please select date and ceremony time.'); return; }
-    const ceremonyStart = parseTimeOnDate(date, cerTime);
-    const quietStart = addMinutes(ceremonyStart, -30);
-
-    const events = [];
-
-    // ===== Getting Ready =====
-    if(fl){
-      // getting dressed -> optional dad FL (10) -> B&G FL (flLen) -> wedding party (45) -> family (45) -> quiet (30)
-      const blocksAfterDress = (dadFL?10:0) + flLen + 45 + 45 + 30;
-      const dressEnd = addMinutes(ceremonyStart, -blocksAfterDress);
-      const dressStart = addMinutes(dressEnd, -30);
-      const arrival = addMinutes(dressStart, -60);
-      events.push({section:'Getting Ready', start:arrival, dur:60, label:'Coverage begins / Photographer arrival', note:''});
-      events.push({section:'Getting Ready', start:arrival, dur:60, label:'Getting ready, candid, venue, detail photos (dress, shoes, rings, invitation suite, flowers, etc.)', note:'Please have details ready upon arrival'});
-      events.push({section:'Getting Ready', start:dressStart, dur:30, label:'Bride + Groom get dressed', note:''});
-      let cursor = new Date(dressEnd);
-      if(dadFL){ events.push({section:'Pre-Ceremony', start:cursor, dur:10, label:'First look with dad or family', note:'approx. 10 min'}); cursor = addMinutes(cursor,10); }
-      events.push({section:'Pre-Ceremony', start:cursor, dur:flLen, label:'First look + Bride & Groom portraits', note:''}); cursor = addMinutes(cursor,flLen);
-      events.push({section:'Pre-Ceremony', start:cursor, dur:45, label:'Wedding party photos', note:'buffer included'}); cursor = addMinutes(cursor,45);
-      events.push({section:'Pre-Ceremony', start:cursor, dur:45, label:'Family photos', note:'buffer included'}); cursor = addMinutes(cursor,45);
-      events.push({section:'Ceremony', start:quietStart, dur:30, label:'Bride + groom tucked away before ceremony; photograph ceremony décor + get ready', note:''});
-    } else {
-      // getting dressed -> (optional dad FL 10) -> bridesmaids 30 -> groomsmen 30 -> quiet 30
-      const dressEnd = addMinutes(quietStart, -60);
-      const dressStart = addMinutes(dressEnd, -30);
-      const arrival = addMinutes(dressStart, -60);
-      events.push({section:'Getting Ready', start:arrival, dur:60, label:'Coverage begins / Photographer arrival', note:''});
-      events.push({section:'Getting Ready', start:arrival, dur:60, label:'Getting ready, candid, venue, detail photos (dress, shoes, rings, invitation suite, flowers, etc.)', note:'Please have details ready upon arrival'});
-      events.push({section:'Getting Ready', start:dressStart, dur:30, label:'Bride + Groom get dressed', note:''});
-      let cursor = new Date(dressEnd);
-      if(dadFL){ events.push({section:'Pre-Ceremony', start:addMinutes(quietStart,-70), dur:10, label:'First look with dad or family', note:'approx. 10 min'}); }
-      events.push({section:'Pre-Ceremony', start:addMinutes(quietStart,-60), dur:30, label:'Bridesmaids portraits', note:'10-min girls first-look buffer inside'});
-      events.push({section:'Pre-Ceremony', start:addMinutes(quietStart,-30), dur:30, label:'Groomsmen portraits', note:'buffer included'});
-      events.push({section:'Ceremony', start:quietStart, dur:30, label:'Bride + groom tucked away before ceremony; photograph ceremony décor + get ready', note:''});
+    // Styled, clickable footer on every page
+    const pageCount = pdf.getNumberOfPages();
+    for(let i=1; i<=pageCount; i++){
+      pdf.setPage(i);
+      const baseY = 770;
+      pdf.setFont('helvetica','italic');
+      pdf.setFontSize(10);
+      pdf.setTextColor(brandColor);
+      pdf.text('Have questions or need help customizing your wedding day timeline? I’d love to help!', 40, baseY);
+      // Clickable email link
+      pdf.setFont('helvetica','bold');
+      pdf.setFontSize(10);
+      pdf.setTextColor(brandColor);
+      // Use textWithLink for a proper clickable mailto link
+      pdf.textWithLink('hello@rulecreativeco.com', 40, baseY + 14, { url: 'mailto:hello@rulecreativeco.com' });
     }
 
-    // Ceremony
-    events.push({section:'Ceremony', start:ceremonyStart, dur:cerLen, label:'Ceremony', note:''});
-
-    // Social hour
-    const ceremonyEnd = addMinutes(ceremonyStart, cerLen);
-    const socialLen = fl?60:90;
-    const socialStart = ceremonyEnd;
-    const socialEnd = addMinutes(socialStart, socialLen);
-    events.push({section:'Social Hour & Portraits', start:socialStart, dur:socialLen, label:'Social hour', note:'Finish family photos / enjoy social hour'});
-
-    // Reception
-    const receptionStart = socialEnd;
-    events.push({section:'Reception (timing approximate)', start:receptionStart, dur:5, label:'Guests seated for dinner', note:''});
-    events.push({section:'Reception (timing approximate)', start:addMinutes(receptionStart,5), dur:10, label:'Grand march', note:''});
-    events.push({section:'Reception (timing approximate)', start:addMinutes(receptionStart,15), dur:5, label:'Welcome speeches', note:''});
-    events.push({section:'Reception (timing approximate)', start:addMinutes(receptionStart,20), dur:30, label:'Dinner served', note:''});
-    events.push({section:'Reception (timing approximate)', start:addMinutes(receptionStart,50), dur:30, label:'Speeches & toasts', note:''});
-
-    // Sunset portraits — 30 min before actual sunset
-    const sunset = computeSunsetMinus30(date);
-    if(sunset){ events.push({section:'Reception (timing approximate)', start:sunset, dur:15, label:'Sunset portraits', note:'golden hour'}); }
-
-    events.push({section:'Reception (timing approximate)', start:addMinutes(receptionStart,80), dur:15, label:'Cake cutting', note:''});
-    events.push({section:'Reception (timing approximate)', start:addMinutes(receptionStart,95), dur:20, label:'First dances', note:''});
-    events.push({section:'Reception (timing approximate)', start:addMinutes(receptionStart,115), dur:0, label:'Open dance floor', note:'', noEnd:true});
-
-    // Coverage end
-    const arrivalEvent = events.find(e=>e.label.includes('Coverage begins'));
-    if(arrivalEvent){
-      const coverageEnd = addMinutes(arrivalEvent.start, coverage*60);
-      events.push({section:'Reception (timing approximate)', start:coverageEnd, dur:0, label:'Coverage ends / Photographers depart', note:'', noEnd:true});
-    }
-
-    render(events);
-    el('timeline').hidden = false;
+    pdf.save('wedding-timeline.pdf');
   }
 
   document.addEventListener('DOMContentLoaded',()=>{
-    el('gen').onclick = buildTimeline;
-    el('pdf').onclick = ()=>window.print();
+    const gen = document.getElementById('gen');
+    const pdfBtn = document.getElementById('pdf');
+    if(gen) gen.onclick = buildTimeline;
+    if(pdfBtn) pdfBtn.onclick = downloadTimelinePDF;
+  });
+})();
+</script>('DOMContentLoaded',()=>{
+    const gen = document.getElementById('gen');
+    const pdf = document.getElementById('pdf');
+    if(gen) gen.onclick = buildTimeline;
+    if(pdf) pdf.onclick = downloadTimelinePDF;
   });
 })();
 </script>
-</body>
-</html>
