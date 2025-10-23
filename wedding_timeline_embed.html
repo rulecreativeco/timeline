@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wedding Timeline Generator – Standalone</title>
+  <style>
+    :root{
+      --bg:#ffffff; --fg:#111; --muted:#666; --brand:#0b6cff; --card:#f7f7f9; --line:#e7e7ee;
+      --radius:14px; --pad:14px; --font: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:var(--font);background:var(--bg);color:var(--fg);}
+    .wrap{max-width:880px;margin:24px auto;padding:0 16px 40px}
+    h1{font-size:1.6rem;margin:14px 0 6px}
+    p{color:var(--muted);margin:0 0 18px}
+    .disclaimer{font-size:.9rem;background:#fff7ea;border:1px solid #ffe4b3;color:#6b4e14;padding:10px 12px;border-radius:12px;margin:12px 0}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:var(--pad);}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    label{display:block;font-size:.9rem;margin:8px 0 6px;color:#333}
+    input, select{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:#fff}
+    input[type="time"]{padding:8px 10px}
+    .hint{font-size:.8rem;color:var(--muted)}
+    .controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    button{appearance:none;border:1px solid var(--brand);background:var(--brand);color:#fff;border-radius:999px;padding:10px 14px;font-weight:600;cursor:pointer}
+    button.alt{background:#fff;color:var(--brand)}
+    .out{margin-top:18px}
+    .timeline{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+    .tl-head{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:#fff;border-bottom:1px solid var(--line)}
+    .tl-list{padding:0;margin:0;list-style:none}
+    .tl-item{display:grid;grid-template-columns:120px 1fr;gap:12px;padding:12px 14px;border-top:1px dashed var(--line);background:#fff}
+    .tl-item:first-child{border-top:none}
+    .time{font-weight:700}
+    .badge{display:inline-block;padding:2px 8px;border-radius:999px;background:#eef3ff;color:#2c4ecb;font-size:.75rem;margin-left:6px}
+    .muted{color:var(--muted)}
+    .footnote{margin-top:8px;font-size:.85rem;color:var(--muted)}
+    @media (max-width:680px){
+      .row{grid-template-columns:1fr}
+      .tl-item{grid-template-columns:100px 1fr}
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Wedding Timeline Generator</h1>
+  <p>Answer a few quick questions. This builds a photo timeline using Samantha’s default rules.</p>
+  <div class="disclaimer">Assumes all events happen at the same venue and <strong>does not include travel time or travel buffers</strong>.</div>
+
+  <div class="card" id="form">
+    <div class="row">
+      <div>
+        <label>Wedding date</label>
+        <input type="date" id="wDate" />
+        <div class="hint">Used to place sunset portraits (Central Minnesota).</div>
+      </div>
+      <div>
+        <label>Coverage hours</label>
+        <select id="coverage">
+          <option value="8">8 hours</option>
+          <option value="10">10 hours</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>First look before the ceremony?</label>
+        <select id="firstLook">
+          <option value="yes">Yes</option>
+          <option value="no">No, we’ll see each other at the ceremony</option>
+        </select>
+      </div>
+      <div>
+        <label>Private vows during first look?</label>
+        <select id="privateVows">
+          <option value="no">No</option>
+          <option value="yes">Yes</option>
+        </select>
+        <div class="hint">If yes, first look + portraits = 60 minutes. Otherwise 45 minutes.</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Ceremony start time</label>
+        <input type="time" id="ceremonyTime" />
+      </div>
+      <div>
+        <label>Ceremony length</label>
+        <select id="ceremonyLen">
+          <option value="30">30 minutes (standard)</option>
+          <option value="20">20 minutes</option>
+          <option value="45">45 minutes</option>
+          <option value="60">60 minutes</option>
+          <option value="75">75 minutes</option>
+          <option value="90">90 minutes</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Preset</label>
+        <select id="preset">
+          <option value="standard">Standard (30-min ceremony)</option>
+          <option value="mass">Full Catholic Mass (60-min ceremony)</option>
+          <option value="outdoor20">Outdoor 20-min</option>
+        </select>
+      </div>
+      <div>
+        <label>&nbsp;</label>
+        <div class="hint">Choosing a preset will adjust the ceremony length above.</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button id="gen" type="button">Generate timeline</button>
+      <button class="alt" id="copy" type="button">Copy</button>
+      <button class="alt" id="pdf" type="button">Download PDF</button>
+      <button class="alt" id="email" type="button">Email</button>
+      <button class="alt" id="print" type="button">Print</button>
+    </div>
+  </div>
+
+  <div class="out">
+    <div class="timeline" id="timeline" hidden>
+      <div class="tl-head">
+        <strong>Timeline</strong>
+        <span class="muted" id="sum"></span>
+      </div>
+      <ul class="tl-list" id="tlList"></ul>
+    </div>
+    <p class="footnote">Rules baked in: 30‑min pre‑ceremony quiet window; buffers built into family and party blocks; getting‑ready dressing = 30 min each; photographer arrival = 60 min before dressing. Sunset portraits auto‑placed ~30 min before sunset for Central Minnesota. This timeline assumes a single venue and excludes travel.</p>
+  </div>
+</div>
+
+<script>
+(function(){
+  // Helper utilities
+  function el(id){ return document.getElementById(id); }
+  function pad(n){ return (n<10?"0":"")+n; }
+  function fmt(d){ return pad(d.getHours())+":"+pad(d.getMinutes()); }
+  function addMinutes(base, m){ return new Date(base.getTime() + m*60000); }
+  function parseTimeOnDate(dateStr, hhmm){ if(!dateStr || !hhmm) return null; var p = hhmm.split(":"); var h = parseInt(p[0]||"0",10); var m = parseInt(p[1]||"0",10); var d = new Date(dateStr + "T00:00:00"); d.setHours(h, m, 0, 0); return d; }
+
+  // Sunset calculator (approx for Central MN lat/lon)
+  function deg2rad(d){ return d*Math.PI/180; }
+  function rad2deg(r){ return r*180/Math.PI; }
+  function dayOfYear(d){ var start = new Date(d.getFullYear(),0,0); return Math.floor((d - start)/86400000); }
+  function computeSunsetMinus30(dateStr){
+    try{
+      var d = new Date(dateStr + 'T12:00:00');
+      var N = dayOfYear(d);
+      var lat = 45.56, lon = -94.16;
+      var lngHour = lon/15;
+      var t = N + ((18 - lngHour) / 24);
+      var M = (0.9856 * t) - 3.289;
+      var L = M + (1.916*Math.sin(deg2rad(M))) + (0.020*Math.sin(deg2rad(2*M))) + 282.634; L = (L+360)%360;
+      var RA = rad2deg(Math.atan(0.91764*Math.tan(deg2rad(L)))); RA = (RA+360)%360;
+      var Lq  = Math.floor(L/90) * 90;
+      var RAq = Math.floor(RA/90) * 90;
+      RA = (RA + (Lq - RAq)) / 15;
+      var sinDec = 0.39782*Math.sin(deg2rad(L));
+      var cosDec = Math.cos(Math.asin(sinDec));
+      var zenith = 90.833;
+      var cosH = (Math.cos(deg2rad(zenith)) - (sinDec*Math.sin(deg2rad(lat)))) / (cosDec*Math.cos(deg2rad(lat)));
+      if(cosH > 1 || cosH < -1){ return null; }
+      var H = rad2deg(Math.acos(cosH))/15; // hours
+      var T = H + RA - (0.06571 * t) - 6.622;
+      var UT = (T - lngHour) % 24; if(UT < 0) UT += 24;
+      var local = new Date(d); local.setUTCHours(0,0,0,0);
+      var sunset = new Date(local.getTime() + UT*3600000);
+      return addMinutes(sunset, -30);
+    }catch(e){ return null; }
+  }
+
+  var arrivalTime = null;
+
+  function addRow(timeStart, durationMin, label, note){
+    var list = el('tlList');
+    var li = document.createElement('li'); li.className = 'tl-item';
+    var end = addMinutes(timeStart, durationMin);
+    li.innerHTML = '<div class="time">'+fmt(timeStart)+'–'+fmt(end)+'</div><div><div><strong>'+label+'</strong>'+(note? ' <span class="badge">'+note+'</span>':'' )+'</div></div>';
+    list.appendChild(li);
+    return end;
+  }
+
+  function buildTimeline(){
+    var date = el('wDate').value;
+    var fl = el('firstLook').value === 'yes';
+    var vows = el('privateVows').value === 'yes';
+    var flLen = vows ? 60 : 45;
+    var cerTime = el('ceremonyTime').value;
+    var cerLen = parseInt(el('ceremonyLen').value,10) || 30;
+    var coverage = parseInt(el('coverage').value,10);
+
+    if(!date){ alert('Please select a wedding date.'); return; }
+    var ceremonyStart = parseTimeOnDate(date, cerTime);
+    if(!ceremonyStart){ alert('Please set a ceremony start time.'); return; }
+
+    var TL = el('tlList'); TL.innerHTML = '';
+
+    var quietStart = addMinutes(ceremonyStart, -30);
+    var cursor = new Date(quietStart.getTime());
+
+    if(!fl){
+      cursor = addMinutes(cursor, -30); var gmStart = new Date(cursor);
+      cursor = addMinutes(cursor, -30); var bmStart = new Date(cursor);
+      cursor = addMinutes(cursor, -30); var dressStart = new Date(cursor);
+      arrivalTime = addMinutes(dressStart, -60);
+
+      addRow(arrivalTime, 60, 'Photographer arrives + flatlay/details', 'prep');
+      addRow(dressStart, 30, 'Getting dressed (bride)', 'prep');
+      addRow(dressStart, 30, 'Getting dressed (groom)', 'prep');
+      addRow(bmStart, 30, 'Bridesmaids portraits', '10‑min girls first‑look buffer inside');
+      addRow(gmStart, 30, 'Groomsmen portraits', 'pre‑ceremony');
+
+    } else {
+      cursor = addMinutes(cursor, -45); var famStart = new Date(cursor);
+      cursor = addMinutes(cursor, -45); var partyStart = new Date(cursor);
+      cursor = addMinutes(cursor, -flLen); var flStart = new Date(cursor);
+      cursor = addMinutes(cursor, -30); var dressStart2 = new Date(cursor);
+      arrivalTime = addMinutes(dressStart2, -60);
+
+      addRow(arrivalTime, 60, 'Photographer arrives + flatlay/details', 'prep');
+      addRow(dressStart2, 30, 'Getting dressed (bride)', 'prep');
+      addRow(dressStart2, 30, 'Getting dressed (groom)', 'prep');
+      addRow(flStart, flLen, 'First look + Bride & Groom portraits', (flLen+' min'));
+      addRow(partyStart, 45, 'Wedding party photos', 'buffer included');
+      addRow(famStart, 45, 'Family photos', 'buffer included');
+    }
+
+    addRow(quietStart, 30, 'Quiet window / hide bride / ceremony details', 'no photos');
+
+    var ceremonyEnd = addMinutes(ceremonyStart, cerLen);
+    addRow(ceremonyStart, cerLen, 'Ceremony', '');
+
+    var afterCursor = new Date(ceremonyEnd);
+    if(!fl){
+      addRow(afterCursor, 30, 'Family photos', 'post‑ceremony');
+      afterCursor = addMinutes(afterCursor, 30);
+      addRow(afterCursor, 20, 'Wedding party photos', 'post‑ceremony');
+      afterCursor = addMinutes(afterCursor, 20);
+      addRow(afterCursor, 20, 'Bride & Groom portraits', 'post‑ceremony');
+      afterCursor = addMinutes(afterCursor, 20);
+    }
+
+    var cocktailMin = (!fl ? 90 : 60);
+    var cocktailEnd = addRow(afterCursor, cocktailMin, 'Cocktail hour', (fl? 'you mingle how you like' : 'with post‑ceremony photos'));
+
+    var receptionStart = new Date(cocktailEnd);
+    addRow(receptionStart, 15, 'Reception begins', 'grand entrance / details');
+
+    var sunsetMinus30 = date ? computeSunsetMinus30(date) : null;
+    if(sunsetMinus30 && sunsetMinus30.getTime() > receptionStart.getTime()){
+      addRow(sunsetMinus30, 15, 'Sunset portraits', 'golden light');
+    }
+
+    var depart = arrivalTime ? addMinutes(arrivalTime, coverage*60) : addMinutes(receptionStart, coverage*60);
+    addRow(depart, 0, 'Photographer departs', (coverage+'‑hour coverage'));
+
+    var sum = date + ' · ' + coverage + 'h coverage · ' + (fl ? 'First look' : 'No first look') + ' · Ceremony ' + fmt(ceremonyStart) + ' ('+cerLen+'m)';
+    el('sum').textContent = sum;
+    el('timeline').hidden = false;
+  }
+
+  // Wire up controls (no external libs, simple and robust)
+  document.addEventListener('DOMContentLoaded', function(){
+    var g = el('gen'); if(g) g.onclick = buildTimeline;
+    var c = el('copy'); if(c) c.onclick = function(){
+      var items = Array.prototype.slice.call(document.querySelectorAll('#tlList .tl-item'));
+      if(!items.length){ alert('Generate a timeline first.'); return; }
+      var text = items.map(function(li){ return li.textContent.trim(); }).join('\n');
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(function(){ alert('Timeline copied to clipboard.'); });
+      } else {
+        var ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); alert('Timeline copied.'); 
+      }
+    };
+    var p = el('print'); if(p) p.onclick = function(){ window.print(); };
+    var e = el('email'); if(e) e.onclick = function(){
+      var items = Array.prototype.slice.call(document.querySelectorAll('#tlList .tl-item'));
+      if(!items.length){ alert('Generate a timeline first.'); return; }
+      var date = el('wDate').value || '';
+      var subject = encodeURIComponent('Wedding Photo Timeline – ' + date);
+      var body = encodeURIComponent(items.map(function(li){ return li.textContent.trim(); }).join('\\n'));
+      window.location.href = 'mailto:?subject=' + subject + '&body=' + body;
+    };
+    var preset = el('preset'); if(preset) preset.onchange = function(){
+      var v = this.value; var sel = el('ceremonyLen');
+      if(v === 'mass'){ sel.value = '60'; }
+      else if(v === 'outdoor20'){ sel.value = '20'; }
+      else { sel.value = '30'; }
+    };
+  });
+})();</script>
+</body>
+</html>
