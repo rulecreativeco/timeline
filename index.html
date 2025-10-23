@@ -259,9 +259,18 @@
     const pdf = new jsPDF({orientation:'portrait', unit:'pt', format:'letter'});
     const brand = '#9a633e';
 
-    // Title
-    pdf.setFont('helvetica','bold'); pdf.setFontSize(18); pdf.setTextColor(brand);
-    pdf.text('Rule Creative Co. – Wedding Timeline', 40, 60);
+// Title + subheading
+pdf.setFont('helvetica','bold'); pdf.setFontSize(18); pdf.setTextColor(brand);
+pdf.text('Rule Creative Co. – Wedding Timeline', 40, 60);
+
+
+pdf.setFont('helvetica','italic'); pdf.setFontSize(11); pdf.setTextColor('#333');
+pdf.text('Use this as a general outline and my go-to suggestions. Every wedding day is different, so we’ll tweak and customize your final timeline together.', 40, 80, { maxWidth: 520 });
+pdf.text('Timings are approximate and depend on your coverage preferences.', 40, 96);
+
+
+pdf.setFont('helvetica','normal'); pdf.setFontSize(10); pdf.setTextColor('#666');
+pdf.text('Generated with love by Rule Creative Co.', 40, 112);
 
     // Body
     let y = 90; let currentSec = '';
