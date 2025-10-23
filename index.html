@@ -1,52 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Wedding Timeline Generator – Standalone</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Wedding Timeline Generator – v1.2</title>
   <style>
     :root{
-      --bg:#ffffff; --fg:#111; --muted:#666; --brand:#0b6cff; --card:#f7f7f9; --line:#e7e7ee;
-      --radius:14px; --pad:14px; --font: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      --bg:#ffffff; --fg:#1b1b1b; --muted:#6b7280; --brand:#0b6cff; --brand-ink:#0a47a7; --card:#ffffff; --line:#e5e7eb;
+      --radius:18px; --pad:16px; --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      --shadow: 0 10px 18px rgba(2,12,27,.04), 0 2px 6px rgba(2,12,27,.06);
+      --badge-bg:#eef2ff; --badge-fg:#334155;
     }
     *{box-sizing:border-box}
-    body{margin:0;font-family:var(--font);background:var(--bg);color:var(--fg);}
-    .wrap{max-width:880px;margin:24px auto;padding:0 16px 40px}
-    h1{font-size:1.6rem;margin:14px 0 6px}
-    p{color:var(--muted);margin:0 0 18px}
-    .disclaimer{font-size:.9rem;background:#fff7ea;border:1px solid #ffe4b3;color:#6b4e14;padding:10px 12px;border-radius:12px;margin:12px 0}
-    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:var(--pad);}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    label{display:block;font-size:.9rem;margin:8px 0 6px;color:#333}
-    input, select{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:#fff}
-    input[type="time"]{padding:8px 10px}
+    body{margin:0;font-family:var(--font);background:linear-gradient(180deg,#f8fafc 0%, #fff 22%);color:var(--fg);} 
+    .wrap{max-width:980px;margin:28px auto;padding:0 18px 48px}
+    header.hero{background:radial-gradient(circle at 60% -40%, rgba(11,108,255,.12), transparent 60%);padding:24px 18px 8px;border-radius:28px}
+    h1{font-size:clamp(1.4rem, 2.4vw, 2rem);letter-spacing:.2px;margin:6px 0 6px}
+    .sub{color:var(--muted);margin:0 0 18px;font-size:.98rem}
+    .disclaimer{font-size:.92rem;background:#fffdf7;border:1px solid #fdecc8;color:#8a5d18;padding:10px 12px;border-radius:12px;margin:12px 0;box-shadow:var(--shadow)}
+
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:var(--pad);box-shadow:var(--shadow)}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    label{display:block;font-size:.9rem;margin:8px 0 6px;color:#111827;font-weight:600}
+    input, select{width:100%;padding:12px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;transition:.15s ease;border-color:#d1d5db}
+    input:focus, select:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(11,108,255,.12)}
+    input[type="time"]{padding:10px 12px}
     .hint{font-size:.8rem;color:var(--muted)}
-    .controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
-    button{appearance:none;border:1px solid var(--brand);background:var(--brand);color:#fff;border-radius:999px;padding:10px 14px;font-weight:600;cursor:pointer}
+    .controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+    button{appearance:none;border:1px solid var(--brand);background:var(--brand);color:#fff;border-radius:12px;padding:11px 14px;font-weight:700;cursor:pointer;box-shadow:var(--shadow)}
+    button:hover{filter:brightness(.98)}
     button.alt{background:#fff;color:var(--brand)}
-    .out{margin-top:18px}
-    .timeline{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
-    .tl-head{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:#fff;border-bottom:1px solid var(--line)}
+
+    .out{margin-top:20px}
+    .timeline{border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:var(--shadow)}
+    .tl-head{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:linear-gradient(180deg,#fff, #f8fafc);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:2}
+    .tl-title{display:flex;align-items:center;gap:10px}
+    .tl-title .dot{width:9px;height:9px;border-radius:999px;background:var(--brand)}
     .tl-list{padding:0;margin:0;list-style:none}
-    .tl-item{display:grid;grid-template-columns:120px 1fr;gap:12px;padding:12px 14px;border-top:1px dashed var(--line);background:#fff}
+    .tl-item{display:grid;grid-template-columns:140px 1fr;gap:16px;padding:16px 18px;border-top:1px dashed var(--line);background:#fff}
+    .tl-item:nth-child(even){background:#fcfcff}
     .tl-item:first-child{border-top:none}
-    .time{font-weight:700}
-    .badge{display:inline-block;padding:2px 8px;border-radius:999px;background:#eef3ff;color:#2c4ecb;font-size:.75rem;margin-left:6px}
+    .time{font-weight:800;letter-spacing:.2px}
+    .badge{display:inline-block;padding:3px 10px;border-radius:999px;background:var(--badge-bg);color:var(--badge-fg);font-size:.75rem;margin-left:8px;border:1px solid #e5e7eb}
     .muted{color:var(--muted)}
-    .footnote{margin-top:8px;font-size:.85rem;color:var(--muted)}
-    @media (max-width:680px){
+    .footnote{margin-top:10px;font-size:.88rem;color:var(--muted)}
+
+    .theme-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:4px}
+    .pill{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);padding:8px 10px;border-radius:999px;background:#fff;cursor:pointer}
+    .swatch{width:14px;height:14px;border-radius:50%}
+
+    @media (max-width:760px){
       .row{grid-template-columns:1fr}
-      .tl-item{grid-template-columns:100px 1fr}
+      .tl-item{grid-template-columns:110px 1fr}
     }
   </style>
 </head>
 <body>
 <div class="wrap">
+  <header class="hero">
   <h1>Wedding Timeline Generator</h1>
-  <p>Answer a few quick questions. This builds a photo timeline using Samantha’s default rules.</p>
-  <div class="disclaimer">Assumes all events happen at the same venue and <strong>does not include travel time or travel buffers</strong>.</div>
-
-  <div class="card" id="form">
+  <p class="sub">Fast, clean timelines that mirror how Samantha runs a wedding day. Built backward from ceremony, with buffers and sunset portraits baked in.</p>
+</header>
+<div class="disclaimer">Assumes all events happen at the
     <div class="row">
       <div>
         <label>Wedding date</label>
@@ -114,11 +129,11 @@
     </div>
 
     <div class="controls">
-      <button id="gen" type="button">Generate timeline</button>
-      <button class="alt" id="copy" type="button">Copy</button>
-      <button class="alt" id="pdf" type="button">Download PDF</button>
-      <button class="alt" id="email" type="button">Email</button>
-      <button class="alt" id="print" type="button">Print</button>
+      <button id="gen" type="button" onclick="generateHandler()">Generate timeline</button>
+      <button class="alt" id="copy" type="button" onclick="copyHandler()">Copy</button>
+      <button class="alt" id="pdf" type="button" onclick="pdfHandler()">Download PDF</button>
+      <button class="alt" id="email" type="button" onclick="emailHandler()">Email</button>
+      <button class="alt" id="print" type="button" onclick="window.print()">Print</button>
     </div>
   </div>
 
@@ -132,61 +147,68 @@
     </div>
     <p class="footnote">Rules baked in: 30‑min pre‑ceremony quiet window; buffers built into family and party blocks; getting‑ready dressing = 30 min each; photographer arrival = 60 min before dressing. Sunset portraits auto‑placed ~30 min before sunset for Central Minnesota. This timeline assumes a single venue and excludes travel.</p>
   </div>
+    <div class="timeline" id="timeline" hidden>
+      <div class="tl-head">
+        <strong>Timeline</strong>
+        <span class="muted" id="sum"></span>
+      </div>
+      <ul class="tl-list" id="tlList"></ul>
+    </div>
+    <p class="footnote">Rules baked in: 30‑min pre‑ceremony quiet window; buffers built into family and party blocks; getting‑ready dressing = 30 min each; photographer arrival = 60 min before dressing. Sunset portraits auto‑placed ~30 min before sunset for Central Minnesota. This timeline assumes a single venue and excludes travel.</p>
+  </div>
 </div>
 
 <script>
+// No external dependencies. Everything runs inline for stricter builders (Showit, etc.).
 (function(){
-  // Helper utilities
+  // -------- Helpers --------
   function el(id){ return document.getElementById(id); }
   function pad(n){ return (n<10?"0":"")+n; }
   function fmt(d){ return pad(d.getHours())+":"+pad(d.getMinutes()); }
   function addMinutes(base, m){ return new Date(base.getTime() + m*60000); }
-  function parseTimeOnDate(dateStr, hhmm){ if(!dateStr || !hhmm) return null; var p = hhmm.split(":"); var h = parseInt(p[0]||"0",10); var m = parseInt(p[1]||"0",10); var d = new Date(dateStr + "T00:00:00"); d.setHours(h, m, 0, 0); return d; }
+  function parseTimeOnDate(dateStr, hhmm){ if(!dateStr || !hhmm) return null; var p = hhmm.split(":"); var h = parseInt(p[0],10)||0; var m = parseInt(p[1],10)||0; var d = new Date(dateStr + "T00:00"); d.setHours(h, m, 0, 0); return d; }
 
-  // Sunset calculator (approx for Central MN lat/lon)
+  // -------- Sunset calculator (approx NOAA algorithm) --------
+  // We only need an approximation for Central Minnesota (lat ~45.56, lon ~-94.16)
   function deg2rad(d){ return d*Math.PI/180; }
   function rad2deg(r){ return r*180/Math.PI; }
-  function dayOfYear(d){ var start = new Date(d.getFullYear(),0,0); return Math.floor((d - start)/86400000); }
+  function dayOfYear(d){ var start = new Date(d.getFullYear(),0,0); var diff = d - start; return Math.floor(diff/86400000); }
   function computeSunsetMinus30(dateStr){
     try{
       var d = new Date(dateStr + 'T12:00:00');
       var N = dayOfYear(d);
-      var lat = 45.56, lon = -94.16;
-      var lngHour = lon/15;
+      var lngHour = -94.16/15; // lon / 15
+      // approximate time
       var t = N + ((18 - lngHour) / 24);
       var M = (0.9856 * t) - 3.289;
       var L = M + (1.916*Math.sin(deg2rad(M))) + (0.020*Math.sin(deg2rad(2*M))) + 282.634; L = (L+360)%360;
       var RA = rad2deg(Math.atan(0.91764*Math.tan(deg2rad(L)))); RA = (RA+360)%360;
-      var Lq  = Math.floor(L/90) * 90;
-      var RAq = Math.floor(RA/90) * 90;
-      RA = (RA + (Lq - RAq)) / 15;
+      var Lquadrant  = Math.floor(L/90) * 90;
+      var RAquadrant = Math.floor(RA/90) * 90;
+      RA = RA + (Lquadrant - RAquadrant);
+      RA = RA/15;
       var sinDec = 0.39782*Math.sin(deg2rad(L));
       var cosDec = Math.cos(Math.asin(sinDec));
-      var zenith = 90.833;
-      var cosH = (Math.cos(deg2rad(zenith)) - (sinDec*Math.sin(deg2rad(lat)))) / (cosDec*Math.cos(deg2rad(lat)));
-      if(cosH > 1 || cosH < -1){ return null; }
-      var H = rad2deg(Math.acos(cosH))/15; // hours
+      var zenith = 90.833; // official
+      var cosH = (Math.cos(deg2rad(zenith)) - (sinDec*Math.sin(deg2rad(45.56)))) / (cosDec*Math.cos(deg2rad(45.56)));
+      if(cosH > 1){ return null; } // never sets
+      if(cosH < -1){ return null; } // never rises
+      var H = rad2deg(Math.acos(cosH))/15; // for sunset use H
       var T = H + RA - (0.06571 * t) - 6.622;
-      var UT = (T - lngHour) % 24; if(UT < 0) UT += 24;
+      var UT = (T - lngHour) % 24;
+      if(UT < 0) UT += 24;
       var local = new Date(d); local.setUTCHours(0,0,0,0);
+      // Adjust to local time zone of browser; we assume viewer is Central Time
       var sunset = new Date(local.getTime() + UT*3600000);
       return addMinutes(sunset, -30);
     }catch(e){ return null; }
   }
 
-  var arrivalTime = null;
-
-  function addRow(timeStart, durationMin, label, note){
-    var list = el('tlList');
-    var li = document.createElement('li'); li.className = 'tl-item';
-    var end = addMinutes(timeStart, durationMin);
-    li.innerHTML = '<div class="time">'+fmt(timeStart)+'–'+fmt(end)+'</div><div><div><strong>'+label+'</strong>'+(note? ' <span class="badge">'+note+'</span>':'' )+'</div></div>';
-    list.appendChild(li);
-    return end;
-  }
+  // -------- Timeline core --------
+  var arrivalTime = null; // keep for coverage math
 
   function buildTimeline(){
-    var date = el('wDate').value;
+    var date = el('wDate').value; 
     var fl = el('firstLook').value === 'yes';
     var vows = el('privateVows').value === 'yes';
     var flLen = vows ? 60 : 45;
@@ -194,11 +216,12 @@
     var cerLen = parseInt(el('ceremonyLen').value,10) || 30;
     var coverage = parseInt(el('coverage').value,10);
 
-    if(!date){ alert('Please select a wedding date.'); return; }
     var ceremonyStart = parseTimeOnDate(date, cerTime);
+    if(!date){ alert('Please select a wedding date.'); return; }
     if(!ceremonyStart){ alert('Please set a ceremony start time.'); return; }
 
-    var TL = el('tlList'); TL.innerHTML = '';
+    var TL = el('tlList');
+    TL.innerHTML = '';
 
     var quietStart = addMinutes(ceremonyStart, -30);
     var cursor = new Date(quietStart.getTime());
@@ -264,35 +287,54 @@
     el('timeline').hidden = false;
   }
 
-  // Wire up controls (no external libs, simple and robust)
+  function addRow(timeStart, durationMin, label, note){
+    var list = el('tlList');
+    var li = document.createElement('li'); li.className = 'tl-item';
+    var end = addMinutes(timeStart, durationMin);
+    li.innerHTML = '<div class="time">'+fmt(timeStart)+'–'+fmt(end)+'</div><div><div><strong>'+label+'</strong>'+(note? ' <span class="badge">'+note+'</span>':'' )+'</div></div>';
+    list.appendChild(li);
+    return end;
+  }
+
+  function doCopy(){
+    var items = Array.prototype.slice.call(document.querySelectorAll('#tlList .tl-item'));
+    var list = items.map(function(li){ return li.textContent.trim(); }).join('
+');
+    if(!list){ alert('Generate a timeline first.'); return; }
+    if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(list).then(function(){ alert('Timeline copied to clipboard.'); }); }
+    else { var ta = document.createElement('textarea'); ta.value = list; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); alert('Timeline copied.'); }
+  }
+
+  function emailHandler(){
+    var items = Array.prototype.slice.call(document.querySelectorAll('#tlList .tl-item'));
+    if(!items.length){ alert('Generate a timeline first.'); return; }
+    var date = el('wDate').value || '';
+    var subject = encodeURIComponent('Wedding Photo Timeline – ' + date);
+    var body = encodeURIComponent(items.map(function(li){ return li.textContent.trim(); }).join('
+'));
+    window.location.href = 'mailto:?subject=' + subject + '&body=' + body;
+  }
+
+  function pdfHandler(){
+    // Use print as a universal, dependency-free PDF generator
+    window.print();
+  }
+
+  // Expose safe handlers for onclick attributes and for addEventListener fallback
+  window.generateHandler = function(){ try { buildTimeline(); } catch(e){ alert('Error building timeline: '+ e.message); } };
+  window.copyHandler = function(){ try { doCopy(); } catch(e){ alert('Copy failed: '+ e.message); } };
+  window.emailHandler = function(){ try { emailHandler(); } catch(e){ alert('Email failed: '+ e.message); } };
+  window.pdfHandler = function(){ try { pdfHandler(); } catch(e){ alert('PDF failed: '+ e.message); } };
+
+  // Also bind after DOM is ready (double coverage for stricter builders)
   document.addEventListener('DOMContentLoaded', function(){
-    var g = el('gen'); if(g) g.onclick = buildTimeline;
-    var c = el('copy'); if(c) c.onclick = function(){
-      var items = Array.prototype.slice.call(document.querySelectorAll('#tlList .tl-item'));
-      if(!items.length){ alert('Generate a timeline first.'); return; }
-      var text = items.map(function(li){ return li.textContent.trim(); }).join('\n');
-      if(navigator.clipboard && navigator.clipboard.writeText){
-        navigator.clipboard.writeText(text).then(function(){ alert('Timeline copied to clipboard.'); });
-      } else {
-        var ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); alert('Timeline copied.'); 
-      }
-    };
-    var p = el('print'); if(p) p.onclick = function(){ window.print(); };
-    var e = el('email'); if(e) e.onclick = function(){
-      var items = Array.prototype.slice.call(document.querySelectorAll('#tlList .tl-item'));
-      if(!items.length){ alert('Generate a timeline first.'); return; }
-      var date = el('wDate').value || '';
-      var subject = encodeURIComponent('Wedding Photo Timeline – ' + date);
-      var body = encodeURIComponent(items.map(function(li){ return li.textContent.trim(); }).join('\\n'));
-      window.location.href = 'mailto:?subject=' + subject + '&body=' + body;
-    };
-    var preset = el('preset'); if(preset) preset.onchange = function(){
-      var v = this.value; var sel = el('ceremonyLen');
-      if(v === 'mass'){ sel.value = '60'; }
-      else if(v === 'outdoor20'){ sel.value = '20'; }
-      else { sel.value = '30'; }
-    };
+    var g = el('gen'); if(g) g.addEventListener('click', window.generateHandler);
+    var c = el('copy'); if(c) c.addEventListener('click', window.copyHandler);
+    var e = el('email'); if(e) e.addEventListener('click', window.emailHandler);
+    var p = el('pdf'); if(p) p.addEventListener('click', window.pdfHandler);
+    var preset = el('preset'); if(preset){ preset.addEventListener('change', function(){ var v=this.value; var sel = el('ceremonyLen'); if(v==='mass'){ sel.value='60'; } else if(v==='outdoor20'){ sel.value='20'; } else { sel.value='30'; } }); }
   });
-})();</script>
+})();
+</script>
 </body>
 </html>
