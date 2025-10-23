@@ -7,80 +7,45 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root{
-      --bg:#ffffff; --fg:#1b1b1b; --muted:#6b7280; --brand:#9a633e; --brand-ink:#7f5032; --card:#ffffff; --line:#e5e7eb;
-      --radius:18px; --pad:16px; --font-body:'Montserrat', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, 'Apple Color Emoji','Segoe UI Emoji';
-      --font-accent: 'Morally Serif', Georgia, 'Times New Roman', serif;
-      --shadow: 0 10px 18px rgba(2,12,27,.04), 0 2px 6px rgba(2,12,27,.06);
+      --bg:#ffffff; --fg:#1b1b1b; --muted:#6b7280; --brand:#9a633e; --card:#ffffff; --line:#e5e7eb;
+      --radius:18px; --pad:16px; --font-body:'Montserrat', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      --font-accent:'Morally Serif', Georgia, serif; --shadow:0 10px 18px rgba(2,12,27,.04), 0 2px 6px rgba(2,12,27,.06);
       --badge-bg:#f7efe9; --badge-fg:#5b3a25;
     }
     *{box-sizing:border-box}
-    body{margin:0;font-family:var(--font-body);background:linear-gradient(180deg,#fafafa 0%, #fff 22%);color:var(--fg);} 
+    body{margin:0;font-family:var(--font-body);background:#fff;color:var(--fg);} 
     .wrap{max-width:920px;margin:28px auto;padding:0 18px 64px}
-    header.hero{display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;background:radial-gradient(circle at 60% -40%, rgba(154,99,62,.10), transparent 60%);padding:28px 18px;border-radius:28px}
-    .logo{height:46px;object-fit:contain}
-    h1{font-family:var(--font-accent);font-weight:600;font-size:clamp(1.6rem, 3vw, 2.4rem);letter-spacing:.2px;margin:0}
-    .sub{color:var(--muted);margin:4px 0 4px;font-size:1rem;max-width:820px}
-    .sub strong{color:#374151}
-    .disclaimer{font-size:.92rem;background:#fffdf7;border:1px solid #fdecc8;color:#8a5d18;padding:10px 12px;border-radius:12px;margin:12px auto;box-shadow:var(--shadow);max-width:820px}
+    header.hero{text-align:center;padding:28px 18px;border-radius:28px}
+    h1{font-family:var(--font-accent);font-weight:600;font-size:clamp(1.6rem, 3vw, 2.4rem);margin:0}
+    .sub{color:var(--muted);margin:8px auto;font-size:1rem;max-width:820px}
 
     .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:var(--pad);box-shadow:var(--shadow);margin-top:16px}
     .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
     label{display:block;font-size:.9rem;margin:8px 0 6px;color:#111827;font-weight:700}
-    input, select{width:100%;padding:12px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;transition:.15s ease;border-color:#d1d5db}
-    input:focus, select:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(154,99,62,.18)}
-    input[type="time"]{padding:10px 12px}
-    .hint{font-size:.8rem;color:var(--muted)}
+    input, select{width:100%;padding:12px;border:1px solid var(--line);border-radius:12px;background:#fff}
     .controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;justify-content:center}
-    button{appearance:none;border:1px solid var(--brand);background:var(--brand);color:#fff;border-radius:999px;padding:12px 18px;font-weight:800;cursor:pointer;box-shadow:var(--shadow);letter-spacing:.3px}
-    button:hover{filter:brightness(.98)}
+    button{border:1px solid var(--brand);background:var(--brand);color:#fff;border-radius:999px;padding:12px 18px;font-weight:800;cursor:pointer}
     button.alt{background:#fff;color:var(--brand)}
 
-    .out{margin-top:20px}
     .timeline{border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:var(--shadow)}
-    .tl-head{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;background:linear-gradient(180deg,#fff, #f8fafc);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:2}
-    .tl-title{display:flex;align-items:center;gap:10px}
-    .tl-title .dot{width:9px;height:9px;border-radius:999px;background:var(--brand)}
-    .tl-list{padding:0;margin:0;list-style:none}
     .tl-item{display:grid;grid-template-columns:140px 1fr;gap:16px;padding:16px 18px;border-top:1px dashed var(--line);background:#fff}
     .tl-item:nth-child(even){background:#fffaf7}
-    .tl-item:first-child{border-top:none}
-    .tl-section{background:#fbf7f4;border-top:1px solid #f0e6df; font-weight:800; font-family:var(--font-accent); letter-spacing:.4px}
-    .tl-section .time{opacity:.35}
-    .time{font-weight:900;letter-spacing:.2px}
-    .badge{display:inline-block;padding:3px 10px;border-radius:999px;background:var(--badge-bg);color:var(--badge-fg);font-size:.75rem;margin-left:8px;border:1px solid #ead9cf}
-    .muted{color:var(--muted)}
-    .footnote{margin-top:12px;font-size:.9rem;color:var(--muted);text-align:center}
-
-    @media (max-width:760px){
-      .row{grid-template-columns:1fr}
-      .tl-item{grid-template-columns:110px 1fr}
-    }
-
-    /* Print styling for clean PDF */
-    @media print{
-      .controls, .disclaimer, #form, header.hero{display:none}
-      .wrap{max-width:100%;padding:0}
-      .timeline{box-shadow:none;border:0}
-      body{background:#fff}
-    }
+    .tl-section{background:#fbf7f4;border-top:1px solid #f0e6df;font-weight:800;font-family:var(--font-accent)}
+    .badge{display:inline-block;padding:3px 10px;border-radius:999px;background:var(--badge-bg);color:var(--badge-fg);font-size:.75rem;margin-left:8px}
   </style>
 </head>
 <body>
 <div class="wrap">
   <header class="hero">
-    <!-- Set your logo URL below -->
-    <img class="logo" id="logo" src="" alt="Rule Creative Co." />
     <h1>Wedding Timeline Generator</h1>
-    <p class="sub"><strong>Use this as a general outline and my go‑to suggestions.</strong> Every wedding day is different, so we’ll tweak and customize your final timeline together. This tool just gets you 90% of the way there fast.</p>
+    <p class="sub"><strong>Use this as a general outline and my go-to suggestions.</strong> Every wedding day is different, so we’ll tweak and customize your final timeline together. Timings are approximate and depend on your coverage preferences.</p>
   </header>
-  <div class="disclaimer">Assumes all events happen at the same venue and <strong>does not include travel time or travel buffers</strong>.</div>
 
   <div class="card" id="form">
     <div class="row">
       <div>
         <label>Wedding date</label>
         <input type="date" id="wDate" />
-        <div class="hint">Used to place sunset portraits (Central Minnesota).</div>
       </div>
       <div>
         <label>Coverage hours</label>
@@ -105,42 +70,34 @@
           <option value="no">No</option>
           <option value="yes">Yes</option>
         </select>
-        <div class="hint">If yes, first look + portraits = 60 minutes. Otherwise 45 minutes.</div>
       </div>
     </div>
 
     <div class="row">
       <div>
+        <label>Add first look with dad / family?</label>
+        <select id="dadFirstLook">
+          <option value="no">No</option>
+          <option value="yes">Yes</option>
+        </select>
+      </div>
+      <div>
         <label>Ceremony start time</label>
         <input type="time" id="ceremonyTime" />
       </div>
+    </div>
+
+    <div class="row">
       <div>
         <label>Ceremony length</label>
         <select id="ceremonyLen">
-          <option value="30">30 minutes (standard)</option>
           <option value="20">20 minutes</option>
+          <option value="30">30 minutes (standard)</option>
           <option value="45">45 minutes</option>
           <option value="60">60 minutes</option>
           <option value="75">75 minutes</option>
           <option value="90">90 minutes</option>
         </select>
-        <div class="hint">Presets adjust this automatically.</div>
-      </div>
-    </div>
-
-    <div class="row">
-      <div>
-        <label>Preset</label>
-        <select id="preset">
-          <option value="standard">Standard (30‑min ceremony)</option>
-          <option value="mass">Full Catholic Mass (60‑min ceremony)</option>
-          <option value="outdoor20">Outdoor 20‑min</option>
-        </select>
-        <div class="hint">Ceremony length updates automatically.</div>
-      </div>
-      <div>
-        <label>Brand</label>
-        <div class="hint">Styled for Rule Creative Co. (Montserrat + Morally Serif, #9a633e).</div>
       </div>
     </div>
 
@@ -150,181 +107,167 @@
     </div>
   </div>
 
-  <div class="out">
-    <div class="timeline" id="timeline" hidden>
-      <div class="tl-head">
-        <div class="tl-title"><span class="dot"></span><strong>Timeline</strong></div>
-        <span class="muted" id="sum"></span>
-      </div>
-      <ul class="tl-list" id="tlList"></ul>
-    </div>
-    <p class="footnote">30‑min pre‑ceremony quiet window; buffers inside family & party blocks; bride & groom dressing = 30 min each; photographer arrival = 60 min before dressing. Sunset portraits auto‑placed ~30 min before sunset for Central Minnesota. Single‑venue assumption; travel not included.</p>
+  <div class="timeline" id="timeline" hidden>
+    <ul class="tl-list" id="tlList"></ul>
   </div>
 </div>
 
 <script>
 (function(){
-  // ====== Helpers ======
-  function el(id){ return document.getElementById(id); }
-  function pad(n){ return (n<10?"0":"")+n; }
-  function fmt(d){ return pad(d.getHours())+":"+pad(d.getMinutes()); }
-  function addMinutes(base, m){ return new Date(base.getTime() + m*60000); }
-  function parseTimeOnDate(dateStr, hhmm){ if(!dateStr || !hhmm) return null; var p = hhmm.split(":"); var h = parseInt(p[0]||"0",10); var m = parseInt(p[1]||"0",10); var d = new Date(dateStr + "T00:00:00"); d.setHours(h, m, 0, 0); return d; }
+  // ---------- helpers ----------
+  const el = id => document.getElementById(id);
+  const addMinutes = (base,m) => new Date(base.getTime()+m*60000);
+  const parseTimeOnDate = (dateStr,hhmm)=>{ if(!dateStr||!hhmm) return null; const [h,m]=hhmm.split(':').map(Number); const d=new Date(`${dateStr}T00:00:00`); d.setHours(h,m,0,0); return d; };
+  const fmt12 = d => { let h=d.getHours(), m=d.getMinutes(); const ampm=h>=12?'PM':'AM'; h=h%12; if(h===0)h=12; return `${h}:${String(m).padStart(2,'0')} ${ampm}`; };
 
-  // Sunset calculator (approx for Central MN lat/lon)
-  function deg2rad(d){ return d*Math.PI/180; }
-  function rad2deg(r){ return r*180/Math.PI; }
-  function dayOfYear(d){ var start = new Date(d.getFullYear(),0,0); return Math.floor((d - start)/86400000); }
-  function computeSunsetMinus30(dateStr){
+  // NOAA-style sunset calc for Central Minnesota (lat 45.56, lon -94.16), returns local time minus 30 min
+  const computeSunsetMinus30 = (dateStr) => {
+    // Sunset for Central Minnesota (lat 45.56, lon -94.16) in LOCAL time, rounded to nearest 15 min, then minus 30 min.
+    const deg2rad = d => d*Math.PI/180, rad2deg = r => r*180/Math.PI;
+    const roundToQuarter = (dt) => {
+      const d = new Date(dt);
+      d.setSeconds(0,0);
+      let mins = d.getMinutes();
+      let rounded = Math.round(mins/15)*15;
+      if(rounded === 60){ d.setHours(d.getHours()+1); rounded = 0; }
+      d.setMinutes(rounded);
+      return d;
+    };
     try{
-      var d = new Date(dateStr + 'T12:00:00');
-      var N = dayOfYear(d);
-      var lat = 45.56, lon = -94.16;
-      var lngHour = lon/15;
-      var t = N + ((18 - lngHour) / 24);
-      var M = (0.9856 * t) - 3.289;
-      var L = M + (1.916*Math.sin(deg2rad(M))) + (0.020*Math.sin(deg2rad(2*M))) + 282.634; L = (L+360)%360;
-      var RA = rad2deg(Math.atan(0.91764*Math.tan(deg2rad(L)))); RA = (RA+360)%360;
-      var Lq  = Math.floor(L/90) * 90;
-      var RAq = Math.floor(RA/90) * 90;
-      RA = (RA + (Lq - RAq)) / 15;
-      var sinDec = 0.39782*Math.sin(deg2rad(L));
-      var cosDec = Math.cos(Math.asin(sinDec));
-      var zenith = 90.833;
-      var cosH = (Math.cos(deg2rad(zenith)) - (sinDec*Math.sin(deg2rad(lat)))) / (cosDec*Math.cos(deg2rad(lat)));
-      if(cosH > 1 || cosH < -1){ return null; }
-      var H = rad2deg(Math.acos(cosH))/15; // hours
-      var T = H + RA - (0.06571 * t) - 6.622;
-      var UT = (T - lngHour) % 24; if(UT < 0) UT += 24;
-      var local = new Date(d); local.setUTCHours(0,0,0,0);
-      var sunset = new Date(local.getTime() + UT*3600000);
-      return addMinutes(sunset, -30);
+      const selectedLocal = new Date(`${dateStr}T00:00:00`);
+      const start = new Date(selectedLocal.getFullYear(),0,0);
+      const N = Math.floor((selectedLocal - start)/86400000);
+      const lat = 45.56, lon = -94.16;
+      const lngHour = lon/15;
+      const t = N + ((18 - lngHour) / 24);
+      const M = (0.9856 * t) - 3.289;
+      let L = M + (1.916*Math.sin(deg2rad(M))) + (0.020*Math.sin(deg2rad(2*M))) + 282.634; L = (L + 360) % 360;
+      let RA = rad2deg(Math.atan(0.91764 * Math.tan(deg2rad(L)))); RA = (RA + 360) % 360;
+      const Lq  = Math.floor(L/90) * 90; const RAq = Math.floor(RA/90) * 90; RA = (RA + (Lq - RAq)) / 15;
+      const sinDec = 0.39782 * Math.sin(deg2rad(L)); const cosDec = Math.cos(Math.asin(sinDec));
+      const zenith = 90.833;
+      const cosH = (Math.cos(deg2rad(zenith)) - (sinDec * Math.sin(deg2rad(lat)))) / (cosDec * Math.cos(deg2rad(lat)));
+      if(cosH < -1 || cosH > 1) return null;
+      const H = Math.acos(cosH) * 180/Math.PI / 15;
+      const T = H + RA - (0.06571 * t) - 6.622;
+      const UT = ((T - lngHour) % 24 + 24) % 24;
+      // Build a date in LOCAL time on the selected day using the UT hours converted via timezone
+      const baseUTCms = Date.UTC(selectedLocal.getFullYear(), selectedLocal.getMonth(), selectedLocal.getDate());
+      let sunsetLocal = new Date(baseUTCms + UT*3600000);
+      // If this landed before the selected local midnight (e.g., 02:00 UTC -> previous local date), bump a day
+      if (sunsetLocal < selectedLocal) sunsetLocal = new Date(sunsetLocal.getTime() + 24*3600000);
+      const minus30 = new Date(sunsetLocal.getTime() - 30*60000);
+      return roundToQuarter(minus30);
     }catch(e){ return null; }
-  }
+  };
 
-  // ====== Timeline core ======
-  var arrivalTime = null;
-
-  function addRow(timeStart, durationMin, label, note){
-    var list = el('tlList');
-    var li = document.createElement('li'); li.className = 'tl-item';
-    var end = addMinutes(timeStart, durationMin);
-    li.innerHTML = '<div class="time">'+fmt(timeStart)+'–'+fmt(end)+'</div><div><div><strong>'+label+'</strong>'+(note? ' <span class="badge">'+note+'</span>':'' )+'</div></div>';
-    list.appendChild(li);
-    return end;
-  }
-  function addSection(label){
-    var list = el('tlList');
-    var li = document.createElement('li'); li.className = 'tl-item tl-section';
-    li.innerHTML = '<div class="time">—</div><div>'+label+'</div>';
-    list.appendChild(li);
+  function render(events){
+    events.sort((a,b)=>a.start-b.start);
+    const list = el('tlList'); list.innerHTML='';
+    let currentSection = '';
+    for(const ev of events){
+      if(ev.section !== currentSection){
+        const sec = document.createElement('li');
+        sec.className = 'tl-item tl-section';
+        sec.innerHTML = `<div class="time">—</div><div>${ev.section}</div>`;
+        list.appendChild(sec);
+        currentSection = ev.section;
+      }
+      const li = document.createElement('li');
+      li.className = 'tl-item';
+      const end = ev.dur ? addMinutes(ev.start, ev.dur) : ev.start;
+      li.innerHTML = `<div class="time">${fmt12(ev.start)}${ev.noEnd?'':`–${fmt12(end)}`}</div><div><strong>${ev.label}</strong>${ev.note?` <span class='badge'>${ev.note}</span>`:''}</div>`;
+      list.appendChild(li);
+    }
   }
 
   function buildTimeline(){
-    var date = el('wDate').value;
-    var fl = el('firstLook').value === 'yes';
-    var vows = el('privateVows').value === 'yes';
-    var flLen = vows ? 60 : 45;
-    var cerTime = el('ceremonyTime').value;
-    var cerLen = parseInt(el('ceremonyLen').value,10) || 30;
-    var coverage = parseInt(el('coverage').value,10);
+    const date = el('wDate').value;
+    const fl = el('firstLook').value==='yes';
+    const vows = el('privateVows').value==='yes';
+    const dadFL = el('dadFirstLook').value==='yes';
+    const flLen = vows?60:45;
+    const cerTime = el('ceremonyTime').value;
+    const cerLen = parseInt(el('ceremonyLen').value,10) || 30;
+    const coverage = parseInt(el('coverage').value,10) || 8;
 
-    if(!date){ alert('Please select a wedding date.'); return; }
-    var ceremonyStart = parseTimeOnDate(date, cerTime);
-    if(!ceremonyStart){ alert('Please set a ceremony start time.'); return; }
+    if(!date || !cerTime){ alert('Please select date and ceremony time.'); return; }
+    const ceremonyStart = parseTimeOnDate(date, cerTime);
+    const quietStart = addMinutes(ceremonyStart, -30);
 
-    var TL = el('tlList'); TL.innerHTML = '';
+    const events = [];
 
-    var quietStart = addMinutes(ceremonyStart, -30);
-    var cursor = new Date(quietStart.getTime());
-
-    // PREP
-    addSection('Prep');
-    if(!fl){
-      cursor = addMinutes(cursor, -30); var gmStart = new Date(cursor);
-      cursor = addMinutes(cursor, -30); var bmStart = new Date(cursor);
-      cursor = addMinutes(cursor, -30); var dressStart = new Date(cursor);
-      arrivalTime = addMinutes(dressStart, -60);
-      addRow(arrivalTime, 60, 'Photographer arrives + flatlay/details', 'prep');
-      addRow(dressStart, 30, 'Getting dressed (bride)', 'prep');
-      addRow(dressStart, 30, 'Getting dressed (groom)', 'prep');
+    // ===== Getting Ready =====
+    if(fl){
+      // getting dressed -> optional dad FL (10) -> B&G FL (flLen) -> wedding party (45) -> family (45) -> quiet (30)
+      const blocksAfterDress = (dadFL?10:0) + flLen + 45 + 45 + 30;
+      const dressEnd = addMinutes(ceremonyStart, -blocksAfterDress);
+      const dressStart = addMinutes(dressEnd, -30);
+      const arrival = addMinutes(dressStart, -60);
+      events.push({section:'Getting Ready', start:arrival, dur:60, label:'Coverage begins / Photographer arrival', note:''});
+      events.push({section:'Getting Ready', start:arrival, dur:60, label:'Getting ready, candid, venue, detail photos (dress, shoes, rings, invitation suite, flowers, etc.)', note:'Please have details ready upon arrival'});
+      events.push({section:'Getting Ready', start:dressStart, dur:30, label:'Bride + Groom get dressed', note:''});
+      let cursor = new Date(dressEnd);
+      if(dadFL){ events.push({section:'Pre-Ceremony', start:cursor, dur:10, label:'First look with dad or family', note:'approx. 10 min'}); cursor = addMinutes(cursor,10); }
+      events.push({section:'Pre-Ceremony', start:cursor, dur:flLen, label:'First look + Bride & Groom portraits', note:''}); cursor = addMinutes(cursor,flLen);
+      events.push({section:'Pre-Ceremony', start:cursor, dur:45, label:'Wedding party photos', note:'buffer included'}); cursor = addMinutes(cursor,45);
+      events.push({section:'Pre-Ceremony', start:cursor, dur:45, label:'Family photos', note:'buffer included'}); cursor = addMinutes(cursor,45);
+      events.push({section:'Ceremony', start:quietStart, dur:30, label:'Bride + groom tucked away before ceremony; photograph ceremony décor + get ready', note:''});
     } else {
-      cursor = addMinutes(cursor, -45); var famStart = new Date(cursor);
-      cursor = addMinutes(cursor, -45); var partyStart = new Date(cursor);
-      cursor = addMinutes(cursor, -flLen); var flStart = new Date(cursor);
-      cursor = addMinutes(cursor, -30); var dressStart2 = new Date(cursor);
-      arrivalTime = addMinutes(dressStart2, -60);
-      addRow(arrivalTime, 60, 'Photographer arrives + flatlay/details', 'prep');
-      addRow(dressStart2, 30, 'Getting dressed (bride)', 'prep');
-      addRow(dressStart2, 30, 'Getting dressed (groom)', 'prep');
+      // getting dressed -> (optional dad FL 10) -> bridesmaids 30 -> groomsmen 30 -> quiet 30
+      const dressEnd = addMinutes(quietStart, -60);
+      const dressStart = addMinutes(dressEnd, -30);
+      const arrival = addMinutes(dressStart, -60);
+      events.push({section:'Getting Ready', start:arrival, dur:60, label:'Coverage begins / Photographer arrival', note:''});
+      events.push({section:'Getting Ready', start:arrival, dur:60, label:'Getting ready, candid, venue, detail photos (dress, shoes, rings, invitation suite, flowers, etc.)', note:'Please have details ready upon arrival'});
+      events.push({section:'Getting Ready', start:dressStart, dur:30, label:'Bride + Groom get dressed', note:''});
+      let cursor = new Date(dressEnd);
+      if(dadFL){ events.push({section:'Pre-Ceremony', start:addMinutes(quietStart,-70), dur:10, label:'First look with dad or family', note:'approx. 10 min'}); }
+      events.push({section:'Pre-Ceremony', start:addMinutes(quietStart,-60), dur:30, label:'Bridesmaids portraits', note:'10-min girls first-look buffer inside'});
+      events.push({section:'Pre-Ceremony', start:addMinutes(quietStart,-30), dur:30, label:'Groomsmen portraits', note:'buffer included'});
+      events.push({section:'Ceremony', start:quietStart, dur:30, label:'Bride + groom tucked away before ceremony; photograph ceremony décor + get ready', note:''});
     }
 
-    // PRE‑CEREMONY
-    addSection('Pre‑Ceremony');
-    if(!fl){
-      addRow(addMinutes(quietStart, -60), 30, 'Bridesmaids portraits', '10‑min girls first‑look buffer inside');
-      addRow(addMinutes(quietStart, -30), 30, 'Groomsmen portraits', 'pre‑ceremony');
-    } else {
-      addRow(addMinutes(quietStart, -(flLen+90)), flLen, 'First look + Bride & Groom portraits', (flLen+' min'));
-      addRow(addMinutes(quietStart, -90), 45, 'Wedding party photos', 'buffer included');
-      addRow(addMinutes(quietStart, -45), 45, 'Family photos', 'buffer included');
+    // Ceremony
+    events.push({section:'Ceremony', start:ceremonyStart, dur:cerLen, label:'Ceremony', note:''});
+
+    // Social hour
+    const ceremonyEnd = addMinutes(ceremonyStart, cerLen);
+    const socialLen = fl?60:90;
+    const socialStart = ceremonyEnd;
+    const socialEnd = addMinutes(socialStart, socialLen);
+    events.push({section:'Social Hour & Portraits', start:socialStart, dur:socialLen, label:'Social hour', note:'Finish family photos / enjoy social hour'});
+
+    // Reception
+    const receptionStart = socialEnd;
+    events.push({section:'Reception (timing approximate)', start:receptionStart, dur:5, label:'Guests seated for dinner', note:''});
+    events.push({section:'Reception (timing approximate)', start:addMinutes(receptionStart,5), dur:10, label:'Grand march', note:''});
+    events.push({section:'Reception (timing approximate)', start:addMinutes(receptionStart,15), dur:5, label:'Welcome speeches', note:''});
+    events.push({section:'Reception (timing approximate)', start:addMinutes(receptionStart,20), dur:30, label:'Dinner served', note:''});
+    events.push({section:'Reception (timing approximate)', start:addMinutes(receptionStart,50), dur:30, label:'Speeches & toasts', note:''});
+
+    // Sunset portraits — 30 min before actual sunset
+    const sunset = computeSunsetMinus30(date);
+    if(sunset){ events.push({section:'Reception (timing approximate)', start:sunset, dur:15, label:'Sunset portraits', note:'golden hour'}); }
+
+    events.push({section:'Reception (timing approximate)', start:addMinutes(receptionStart,80), dur:15, label:'Cake cutting', note:''});
+    events.push({section:'Reception (timing approximate)', start:addMinutes(receptionStart,95), dur:20, label:'First dances', note:''});
+    events.push({section:'Reception (timing approximate)', start:addMinutes(receptionStart,115), dur:0, label:'Open dance floor', note:'', noEnd:true});
+
+    // Coverage end
+    const arrivalEvent = events.find(e=>e.label.includes('Coverage begins'));
+    if(arrivalEvent){
+      const coverageEnd = addMinutes(arrivalEvent.start, coverage*60);
+      events.push({section:'Reception (timing approximate)', start:coverageEnd, dur:0, label:'Coverage ends / Photographers depart', note:'', noEnd:true});
     }
 
-    // CEREMONY
-    addSection('Ceremony');
-    addRow(quietStart, 30, 'Quiet window / hide bride / ceremony details', 'no photos');
-    var ceremonyEnd = addMinutes(ceremonyStart, cerLen);
-    addRow(ceremonyStart, cerLen, 'Ceremony', '');
-
-    // COCKTAIL & PORTRAITS
-    addSection('Cocktail Hour & Portraits');
-    var afterCursor = new Date(ceremonyEnd);
-    if(!fl){
-      addRow(afterCursor, 30, 'Family photos', 'post‑ceremony');
-      afterCursor = addMinutes(afterCursor, 30);
-      addRow(afterCursor, 20, 'Wedding party photos', 'post‑ceremony');
-      afterCursor = addMinutes(afterCursor, 20);
-      addRow(afterCursor, 20, 'Bride & Groom portraits', 'post‑ceremony');
-      afterCursor = addMinutes(afterCursor, 20);
-    }
-    var cocktailMin = (!fl ? 90 : 60);
-    var cocktailEnd = addRow(afterCursor, cocktailMin, 'Cocktail hour', (fl? 'you mingle how you like' : 'with post‑ceremony photos'));
-
-    // RECEPTION
-    addSection('Reception');
-    var receptionStart = new Date(cocktailEnd);
-    addRow(receptionStart, 15, 'Reception begins', 'grand entrance / details');
-
-    // SUNSET
-    var sunsetMinus30 = date ? computeSunsetMinus30(date) : null;
-    if(sunsetMinus30 && sunsetMinus30.getTime() > receptionStart.getTime()){
-      addRow(sunsetMinus30, 15, 'Sunset portraits', 'golden light');
-    }
-
-    // DEPARTURE
-    var depart = arrivalTime ? addMinutes(arrivalTime, coverage*60) : addMinutes(receptionStart, coverage*60);
-    addRow(depart, 0, 'Photographer departs', (coverage+'‑hour coverage'));
-
-    // SUMMARY
-    var sum = date + ' · ' + coverage + 'h coverage · ' + (fl ? 'First look' : 'No first look') + ' · Ceremony ' + fmt(ceremonyStart) + ' ('+cerLen+'m)';
-    el('sum').textContent = sum;
+    render(events);
     el('timeline').hidden = false;
   }
 
-  // ====== Bindings ======
-  document.addEventListener('DOMContentLoaded', function(){
-    var g = el('gen'); if(g) g.onclick = buildTimeline;
-    var p = el('pdf'); if(p) p.onclick = function(){ window.print(); };
-    var preset = el('preset'); if(preset) preset.onchange = function(){
-      var v = this.value; var sel = el('ceremonyLen');
-      if(v === 'mass'){ sel.value = '60'; }
-      else if(v === 'outdoor20'){ sel.value = '20'; }
-      else { sel.value = '30'; }
-    };
-
-    // Optional: set your hosted logo URL here
-    var logoUrl = '';// e.g. 'https://rulecreativeco.com/wp-content/uploads/your-logo.png'
-    if(logoUrl){ var img = el('logo'); if(img) img.src = logoUrl; }
+  document.addEventListener('DOMContentLoaded',()=>{
+    el('gen').onclick = buildTimeline;
+    el('pdf').onclick = ()=>window.print();
   });
 })();
 </script>
