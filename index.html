@@ -343,6 +343,13 @@
 
   pdf.save('wedding-timeline.pdf');
 }
+
+  // wire up buttons once the DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  el('gen').onclick = buildTimeline;
+  el('pdf').onclick = downloadTimelinePDF;
+});
+
 })();
 </script>
 </body>
