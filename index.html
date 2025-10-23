@@ -253,58 +253,96 @@
   }
 
   async function downloadTimelinePDF(){
-    const list = document.querySelectorAll('#tlList .tl-item');
-    if(!list.length){ alert('Please generate a timeline first.'); return; }
-    const { jsPDF } = window.jspdf; // loaded from CDN in <head>
-    const pdf = new jsPDF({orientation:'portrait', unit:'pt', format:'letter'});
-    const brand = '#9a633e';
+  const list = document.querySelectorAll('#tlList .tl-item');
+  if(!list.length){ alert('Please generate a timeline first.'); return; }
+  const { jsPDF } = window.jspdf; // loaded from CDN in <head>
+  const pdf = new jsPDF({orientation:'portrait', unit:'pt', format:'letter'});
+  const brand = '#9a633e';
 
-// Title + subheading
-pdf.setFont('helvetica','bold'); pdf.setFontSize(18); pdf.setTextColor(brand);
-pdf.text('Rule Creative Co. – Wedding Timeline', 40, 60);
+  // Title
+  pdf.setFont('helvetica','bold'); 
+  pdf.setFontSize(18); 
+  pdf.setTextColor(brand);
+  pdf.text('Rule Creative Co. – Wedding Timeline', 40, 60);
 
+  // Subheading (wrap + spacing)
+  const wrapWidth = 520;              // printable width
+  const lineH = 14;                   // line height for text blocks
+  pdf.setFont('helvetica','italic'); 
+  pdf.setFontSize(11); 
+  pdf.setTextColor('#333');
 
-pdf.setFont('helvetica','italic'); pdf.setFontSize(11); pdf.setTextColor('#333');
-pdf.text('Use this as a general outline and my go-to suggestions. Every wedding day is different, so we’ll tweak and customize your final timeline together.', 40, 80, { maxWidth: 520 });
-pdf.text('Timings are approximate and depend on your coverage preferences.', 40, 96);
+  const sub1 = 'Use this as a general outline and my go-to suggestions. Every wedding day is different, so we’ll tweak and customize your final timeline together.';
+  const sub2 = 'Timings are approximate and depend on your coverage preferences.';
 
+  const lines1 = pdf.splitTextToSize(sub1, wrapWidth);
+  const lines2 = pdf.splitTextToSize(sub2, wrapWidth);
 
-pdf.setFont('helvetica','normal'); pdf.setFontSize(10); pdf.setTextColor('#666');
-pdf.text('Generated with love by Rule Creative Co.', 40, 112);
+  let y = 80;
+  lines1.forEach(line => { pdf.text(line, 40, y); y += lineH; });
+  lines2.forEach(line => { pdf.text(line, 40, y); y += lineH; });
 
-    // Body
-    let y = 90; let currentSec = '';
-    list.forEach(item=>{
-      if(item.classList.contains('tl-section')){
-        currentSec = item.textContent.trim();
-        pdf.setFont('times','bold'); pdf.setFontSize(14); pdf.setTextColor(brand);
-        y += 25; pdf.text(currentSec, 40, y);
-        y += 10; pdf.setDrawColor(brand); pdf.line(40, y, 550, y); y += 20;
-      }else{
-        const time = item.querySelector('.time')?.textContent.trim() || '';
-        const desc = item.querySelector('strong')?.textContent.trim() || '';
-        pdf.setFont('helvetica','normal'); pdf.setFontSize(11); pdf.setTextColor('#000');
-        pdf.text(`${time}   ${desc}`, 50, y);
-        y += 18; if(y > 740){ pdf.addPage(); y = 60; }
-      }
-    });
+  // Small branded line separator
+  y += 6;
+  pdf.setDrawColor(brand);
+  pdf.line(40, y, 560, y);
+  y += 20;
 
-    // Styled footer with clickable email on every page
-    const pages = pdf.getNumberOfPages();
-    for(let i=1;i<=pages;i++){
-      pdf.setPage(i);
-      pdf.setFont('helvetica','italic'); pdf.setFontSize(10); pdf.setTextColor(brand);
-      pdf.text('Have questions or need help customizing your wedding day timeline? I’d love to help!', 40, 770);
-      pdf.setFont('helvetica','bold'); pdf.textWithLink('hello@rulecreativeco.com', 40, 784, { url: 'mailto:hello@rulecreativeco.com' });
+  // Body (timeline)
+  let currentSec = '';
+  const addPageIfNeeded = (nextY=18) => {
+    if(y > 740){
+      pdf.addPage();
+      y = 60 + nextY; // top margin on new page
     }
+  };
 
-    pdf.save('wedding-timeline.pdf');
+  list.forEach(item=>{
+    if(item.classList.contains('tl-section')){
+      // Section header
+      addPageIfNeeded(0);
+      currentSec = item.textContent.trim();
+      pdf.setFont('times','bold'); 
+      pdf.setFontSize(14); 
+      pdf.setTextColor(brand);
+      y += 25; 
+      pdf.text(currentSec, 40, y);
+      y += 10; 
+      pdf.setDrawColor(brand); 
+      pdf.line(40, y, 550, y); 
+      y += 20;
+    } else {
+      // Row
+      const time = item.querySelector('.time')?.textContent.trim() || '';
+      const desc = item.querySelector('strong')?.textContent.trim() || '';
+      pdf.setFont('helvetica','normal'); 
+      pdf.setFontSize(11); 
+      pdf.setTextColor('#000');
+
+      const row = `${time}   ${desc}`;
+      const rowLines = pdf.splitTextToSize(row, 520);
+      rowLines.forEach(line=>{
+        addPageIfNeeded();
+        pdf.text(line, 50, y);
+        y += 18;
+      });
+    }
+  });
+
+  // Styled footer with clickable email on every page
+  const pages = pdf.getNumberOfPages();
+  for(let i=1;i<=pages;i++){
+    pdf.setPage(i);
+    pdf.setFont('helvetica','italic'); 
+    pdf.setFontSize(10); 
+    pdf.setTextColor(brand);
+    pdf.text('Have questions or need help customizing your wedding day timeline? I’d love to help!', 40, 770);
+    pdf.setFont('helvetica','bold'); 
+    pdf.textWithLink('hello@rulecreativeco.com', 40, 784, { url: 'mailto:hello@rulecreativeco.com' });
   }
 
-  document.addEventListener('DOMContentLoaded',()=>{
-    el('gen').onclick = buildTimeline;
-    el('pdf').onclick = downloadTimelinePDF;
-  });
+  pdf.save('wedding-timeline.pdf');
+}
 })();
 </script>
 </body>
